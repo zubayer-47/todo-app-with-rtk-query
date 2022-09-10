@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import cancelImage from "../assets/images/cancel.png";
 import {
   useDeleteTodoMutation,
+  useEditTodoMutation,
+  useMakeCompletedMutation,
   useUpdateTodoColorMutation
 } from "../features/api/apiSlice";
-import updatedText from "../redux/todos/thunk/updatedText";
-import updateStatus from "../redux/todos/thunk/updateStatus";
 
 export default function Todo({ todo }) {
   const ref = useRef();
-  const dispatch = useDispatch();
   const { text, id, completed, color } = todo;
+
+  const [editTodo, { isLoading, isError, isSuccess }] = useEditTodoMutation();
 
   const [todoValue, setTodoValue] = useState(text);
 
@@ -29,24 +29,31 @@ export default function Todo({ todo }) {
       isError: isUpdateColorError,
       isLoading: isUpdateColorLoading,
       isSuccess: isUpdateColorSuccess,
-      data
+      data,
     },
   ] = useUpdateTodoColorMutation();
 
-  console.log({isUpdateColorLoading, isUpdateColorSuccess, isUpdateColorError, data})
+  const [makeCompleted, { isLoading: isMakeCompletedLoading }] =
+    useMakeCompletedMutation();
 
   const handleStatusChange = (todoId) => {
-    dispatch(updateStatus(todoId, completed));
+    makeCompleted(todoId);
   };
 
   const handleColorChange = (todoId, color) => {
-    updateTodoColor({id: todoId, color})
-    // dispatch(updateColor(todoId, color));
+    updateTodoColor({ id: todoId, color });
   };
 
   const handleDelete = (todoId) => {
-    // dispatch(deleteTodo(todoId));
     deleteTodo(id);
+  };
+
+  const handleEdit = (e) => {
+    if (e.key === "Enter") {
+      editTodo({ id, text: todoValue });
+      ref.current.disabled = true;
+      ref.current.classList.remove("focus:outline-1", "focus:outline-gray-300");
+    }
   };
 
   return (
@@ -79,18 +86,11 @@ export default function Todo({ todo }) {
         value={todoValue}
         disabled={true}
         onChange={(e) => setTodoValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            dispatch(updatedText(id, todoValue));
-            ref.current.disabled = true;
-            ref.current.classList.remove(
-              "focus:outline-1",
-              "focus:outline-gray-300"
-            );
-          }
-        }}
+        onKeyDown={handleEdit}
         ref={ref}
       />
+
+      {/* <Loading /> */}
 
       <div
         className={`flex-shrink-0 h-4 w-4 rounded-full border-2 ml-auto cursor-pointer hover:bg-green-500 border-green-500 ${
@@ -128,8 +128,8 @@ export default function Todo({ todo }) {
         stroke="currentColor"
         className="w-4 h-4 cursor-pointer"
         onClick={(e) => {
-          ref.current.focus();
           ref.current.disabled = false;
+          ref.current.focus();
           ref.current.classList.add(
             "focus:outline-1",
             "focus:outline-gray-400"

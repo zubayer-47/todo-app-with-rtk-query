@@ -1,40 +1,28 @@
-import { useSelector } from "react-redux";
-import { useGetInCompletedTodosQuery } from "../features/api/apiSlice";
-import numberOfTodos from "../utils/numberOfTodo";
-import Footer from "./Footer";
 import Todo from "./Todo";
 
-export default function TodoList() {
-  const filters = useSelector((state) => state.filters);
+export default function TodoList({todos, isError, isLoading, isSuccess}) {
+  // const filters = useSelector((state) => state.filters);
+  // const filterByStatus = (todo) => {
+  //   const { status } = filters;
+  //   switch (status) {
+  //     case "Complete":
+  //       return todo.completed;
 
-  const {
-    data: todos,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useGetInCompletedTodosQuery();
-  
-  const filterByStatus = (todo) => {
-    const { status } = filters;
-    switch (status) {
-      case "Complete":
-        return todo.completed;
+  //     case "Incomplete":
+  //       return !todo.completed;
 
-      case "Incomplete":
-        return !todo.completed;
+  //     default:
+  //       return true;
+  //   }
+  // };
 
-      default:
-        return true;
-    }
-  };
-
-  const filterByColors = (todo) => {
-    const { colors } = filters;
-    if (colors.length > 0) {
-      return colors.includes(todo?.color);
-    }
-    return true;
-  };
+  // const filterByColors = (todo) => {
+  //   const { colors } = filters;
+  //   if (colors.length > 0) {
+  //     return colors.includes(todo?.color);
+  //   }
+  //   return true;
+  // };
 
   let content = null;
 
@@ -54,8 +42,8 @@ export default function TodoList() {
     content = (
       <div className="mt-4 text-gray-700 text-sm max-h-[300px] overflow-y-auto">
         {todos
-          .filter(filterByStatus)
-          .filter(filterByColors)
+          // .filter(filterByStatus)
+          // .filter(filterByColors)
           .map((todo) => (
             <Todo todo={todo} key={todo.id} />
           ))}
@@ -63,15 +51,9 @@ export default function TodoList() {
     );
   }
 
-  const totalTask = numberOfTodos(todos?.length || 0);
-
   return (
     <>
       {content}
-
-      <hr className="mt-4" />
-
-      <Footer totalTask={totalTask} />
     </>
   );
 }

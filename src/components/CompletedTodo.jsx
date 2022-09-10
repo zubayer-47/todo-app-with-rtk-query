@@ -1,14 +1,17 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import updateStatus from "../redux/todos/thunk/updateStatus";
+import { useRemoveCompletedMutation } from "../features/api/apiSlice";
 
 export default function CompletedTodo({ todo }) {
   const dispatch = useDispatch();
 
+  const [removeCompleted] = useRemoveCompletedMutation();
+
   const { text, id, completed } = todo;
 
   const handleStatusChange = (todoId) => {
-    dispatch(updateStatus(todoId, completed));
+    // dispatch(updateStatus(todoId, completed));
+    removeCompleted(todoId)
   };
 
   return (

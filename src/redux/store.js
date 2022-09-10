@@ -1,11 +1,15 @@
-import { composeWithDevTools } from "@redux-devtools/extension";
-import { applyMiddleware, legacy_createStore as createStore } from "redux";
-import thunkMiddleware from "redux-thunk";
+import { configureStore } from "@reduxjs/toolkit";
+import { apiSlice } from "../features/api/apiSlice";
 import rootReducer from "./rootReducer";
 
-const store = createStore(
-  rootReducer,
-  composeWithDevTools(applyMiddleware(thunkMiddleware))
+const store = configureStore(
+  {
+    reducer: {
+      ...rootReducer,
+      [apiSlice.reducerPath]: apiSlice.reducer,
+    },
+    middleware: getDefaultMiddleware => getDefaultMiddleware().concat(apiSlice.middleware)
+  }
 );
 
 export default store;

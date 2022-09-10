@@ -1,40 +1,31 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { useGetCompletedTodosQuery } from "../features/api/apiSlice";
 import numberOfTodos from "../utils/numberOfTodo";
 import CompletedTodo from "./CompletedTodo";
 
-export default function CompletedList() {
-  const filters = useSelector((state) => state.filters);
+export default function CompletedList({todos, isLoading, isError, isSuccess}) {
+  // const filters = useSelector((state) => state.filters);
 
-  const {
-    data: todos,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useGetCompletedTodosQuery();
+  // const filterByStatus = (todo) => {
+  //   const { status } = filters;
+  //   switch (status) {
+  //     case "Complete":
+  //       return todo.completed;
 
-  const filterByStatus = (todo) => {
-    const { status } = filters;
-    switch (status) {
-      case "Complete":
-        return todo.completed;
+  //     case "Incomplete":
+  //       return !todo.completed;
 
-      case "Incomplete":
-        return !todo.completed;
+  //     default:
+  //       return true;
+  //   }
+  // };
 
-      default:
-        return true;
-    }
-  };
-
-  const filterByColors = (todo) => {
-    const { colors } = filters;
-    if (colors.length > 0) {
-      return colors.includes(todo?.color);
-    }
-    return true;
-  };
+  // const filterByColors = (todo) => {
+  //   const { colors } = filters;
+  //   if (colors.length > 0) {
+  //     return colors.includes(todo?.color);
+  //   }
+  //   return true;
+  // };
 
   let content = null;
 
@@ -54,8 +45,8 @@ export default function CompletedList() {
     content = (
       <div className="mt-2 text-gray-700 text-sm max-h-[300px] overflow-y-auto">
         {todos
-          .filter(filterByStatus)
-          .filter(filterByColors)
+          // .filter(filterByStatus)
+          // .filter(filterByColors)
           .map((todo) => (
             <CompletedTodo todo={todo} key={todo.id} />
           ))}
