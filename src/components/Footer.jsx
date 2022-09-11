@@ -1,36 +1,24 @@
-import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { changeColor } from "../features/filter/filterSlice";
+import { changeColor, changeStatus } from "../features/filter/filterSlice";
 
-export default function Footer({ totalTask, setSkip, setStatus, status, setColors }) {
+export default function Footer({ totalTask }) {
   // const todos = useSelector((state) => state.todos);
-  const {colors} = useSelector((state) => state.filter);
+  const {colors, status} = useSelector((state) => state.filter);
 
   const dispatch = useDispatch();
   // const todosRemaining = todos.filter((todo) => !todo.completed).length;
   // const { status, colors } = filters;
 
-  const memoize = useCallback(() => {
-    setColors(colors)
-    setSkip(true)
-  }, [colors.length])
-
-  useEffect(() => {
-    console.log('rendering')
-    memoize()
-  }, [memoize])
-
   const handleStatusChange = (status) => {
-    setStatus(status)
-    setSkip(true)
-    // dispatch(statusChanged(status));
+
+    dispatch(changeStatus(status));
   };
 
   const handleColorChange = (color) => {
       if (colors.includes(color)) {
-          dispatch(changeColor(color, "removed"));
+          dispatch(changeColor({color, colorType: "removed"}));
       } else {
-          dispatch(changeColor(color, "added"));
+          dispatch(changeColor({color, colorType: "added"}));
       }
   };
 

@@ -8,31 +8,29 @@ export const apiSlice = createApi({
   tagTypes: ["Todos"],
   endpoints: (builder) => ({
     getTodos: builder.query({
-      query: ({status, color}) => {
-        let url = ''
+      query: ({ status, colors }) => {
+        let url = "";
 
-        if (status === 'All' && !color) {
-
-          url = '/todos'
-        } else if (status === 'All' && color) {
-          if (typeof color === 'object') {
-            const str = color.map(c => `color_like=${c}`).join('&');
-            console.log(`/todos?${str}`);
-            url = `/todos?${str}`
-          } else {
-            url = `/todos?color_like=${color}`
-          }
+        if (colors?.length > 0) {
+          url += colors.map((color) => `color_like=${color}`).join("&");
         }
-        else if (status === 'InCompleted') url = '/todos?completed_like=false';
-        else if (status === 'Completed') url = '/todos?completed_like=true';
-        else url = '/todos'
-        
-        console.log(url);
+
+        if (status === "Completed") {
+          url += `${url.length > 0 ? "&" : ""}completed=true`;
+        } else if (status === "InCompleted") {
+          url += `${url.length > 0 ? "&" : ""}completed=false`;
+        } else {
+          url += "";
+        }
+
+        url = `/todos?${url}`;
         return {
           url,
-        }
+          method: "GET",
+        };
       },
-      providesTags: (result, error, arg) => [{type: "Todos", status: arg}],
+      keepUnusedDataFor: 100,
+      providesTags: (result, error, arg) => [{ type: "Todos", status: arg }],
     }),
     // getCompletedTodos: builder.query({
     //   query: () => "/todos?completed_like=true",
@@ -85,7 +83,22 @@ export const apiSlice = createApi({
       query: ({ id, text }) => ({
         url: `/todos/${id}`,
         method: "PATCH",
-        body: {text},
+        body: { text },
+      }),
+      invalidatesTags: ["Todos"],
+    }),
+    clearCompleted: builder.mutation({
+      query: (todoId) => ({
+        url: `/todos/${todoId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Todos"],
+    }),
+    completeAllTodos: builder.mutation({
+      query: (todoId) => ({
+        url: `/todos/${todoId}`,
+        method: "PATCH",
+        body: {completed: true}
       }),
       invalidatesTags: ["Todos"],
     }),
@@ -100,4 +113,6 @@ export const {
   useMakeCompletedMutation,
   useRemoveCompletedMutation,
   useEditTodoMutation,
+  useClearCompletedMutation,
+  useCompleteAllTodosMutation,
 } = apiSlice;

@@ -1,15 +1,26 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import tickImage from "../assets/images/double-tick.png";
 import noteImage from "../assets/images/notes.png";
 import plusImage from "../assets/images/plus.png";
-import { useAddTodoMutation } from "../features/api/apiSlice";
-import { allCompleted, clearCompleted } from "../redux/todos/actions";
+import {
+  useAddTodoMutation,
+  useClearCompletedMutation,
+  useCompleteAllTodosMutation,
+  useGetTodosQuery
+} from "../features/api/apiSlice";
 
 export default function Header() {
   const dispatch = useDispatch();
   const [input, setInput] = useState("");
+  const { colors, status } = useSelector((state) => state.filter);
   const [addTodo, { isLoading, isError, isSuccess }] = useAddTodoMutation();
+  const { data: todos, isSuccess: isTodoQuerySuccess } = useGetTodosQuery({
+    colors,
+    status,
+  });
+  const [clearCompleted] = useClearCompletedMutation();
+  const [completedAllTodos] = useCompleteAllTodosMutation()
 
   const handleInput = (e) => {
     setInput(e.target.value);
@@ -21,12 +32,19 @@ export default function Header() {
     setInput("");
   };
 
-  const completeHadler = () => {
-    dispatch(allCompleted());
+  const handleCompleteAll = () => {
+    const completedAllArr = todos.map((todo) => {
+      completedAllTodos(todo.id)
+    });
   };
 
-  const clearHeandler = () => {
-    dispatch(clearCompleted());
+  const handleClearCompleted = () => {
+    isTodoQuerySuccess &&
+      todos.forEach(
+        (todo) => todo.completed === true && clearCompleted(todo.id)
+      );
+
+    // dispatch(clearCompleted());
   };
 
   return (
@@ -50,11 +68,14 @@ export default function Header() {
       </form>
 
       <ul className="flex justify-between my-4 text-xs text-gray-500">
-        <li className="flex space-x-1 cursor-pointer" onClick={completeHadler}>
+        <li
+          className="flex space-x-1 cursor-pointer"
+          onClick={handleCompleteAll}
+        >
           <img className="w-4 h-4" src={tickImage} alt="Complete" />
           <span>Complete All Tasks</span>
         </li>
-        <li className="cursor-pointer" onClick={clearHeandler}>
+        <li className="cursor-pointer" onClick={handleClearCompleted}>
           Clear completed
         </li>
       </ul>

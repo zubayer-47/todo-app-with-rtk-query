@@ -12,12 +12,13 @@ const filterSlice = createSlice({
       state.status = action.payload;
     },
     changeColor: (state, action) => {
-      const { color, changeType } = action.payload;
+      const { color, colorType } = action.payload;
 
-      if (changeType === "removed") {
+      if (colorType === "removed") {
         state.colors = state.colors.filter((c) => c !== color);
+        console.log(state.colors);
       } else {
-        state.colors = [...state.colors, color];
+        state.colors = [...state.colors, color]
       }
     },
   },

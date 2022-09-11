@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import CompletedList from "./components/CompletedList";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -8,15 +8,9 @@ import { useGetTodosQuery } from "./features/api/apiSlice";
 import numberOfTodos from "./utils/numberOfTodo";
 
 function App() {
-  const [status, setStatus] = useState('All')
-  const [colors, setColors] = useState([])
-  const [skip, setSkip] = useState(true)
-  const { data, isLoading, isError, isSuccess, originalArgs } = useGetTodosQuery({status, colors}, {skip});
-  useEffect(() => {
-    setSkip(prev => !prev)
-
-    console.log({skip})
-  }, [status])
+  const { colors, status } = useSelector((state) => state.filter);
+  const { data, isLoading, isError, isSuccess } =
+    useGetTodosQuery({ status, colors });
 
   let completedTodos = [];
   let inCompletedTodos = [];
@@ -43,7 +37,9 @@ function App() {
           isSuccess={isSuccess}
         />
         <hr className="mt-4" />
-        <Footer totalTask={totalTask} setSkip={setSkip} setStatus={setStatus} status={originalArgs} setColors={setColors} />
+        <Footer
+          totalTask={totalTask}
+        />
       </div>
 
       <hr className="mt-4" />
